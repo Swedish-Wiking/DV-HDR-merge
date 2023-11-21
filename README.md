@@ -24,8 +24,35 @@ DV_HDR_Merge.py -logL debug -maxdif 100 HDR_movie.mkv DV_movie.mp4 HDR_movie2.mk
 HDR media: `*.mkv`<br>
 Dolby Vision media: `*.mkv`, `*.mp4`<br>
 
-*Can be costumized to use `*.mp4` as HDR input as well but Matroska is the superior container.*<br>
+*Can be customized to use `*.mp4` as HDR input as well but Matroska is the superior container.*<br>
 
 **Output format**: `*.mkv`
 
-## Examples
+### Explanations
+
+**Shift frames**:<br>
+A negative amount means that frames will be removed in the beginning and a positive means that the first frame will be duplicated to add enough frame.
+Any excess frame on the end will be cut off
+
+**General**:<br>
+If frame dimensions do not match the script will automagically correct for it.
+
+### Example of code running
+![Command Promt running script](/EXAMPLES/RUNNING.png)
+
+## Frame Compare Tool
+
+![Application window](/EXAMPLES/APPLICATION.png)
+
+1. Opens the active image in your default photo application for easier inspection
+2. Switches between a 50/50 blend of the two compared images or a greyscale difference 
+3. Set the frame to refrence in the HDR media file, press `Enter` to apply. (Total amount of frames in media is shown in label) 
+4. Set how may frames to shift Dolby Vision layer with, press `Enter` to apply.
+5. Closes window and sends inputed frame-shift to be used when combining the two media.<br>
+(Closing the window will do the same as the `Done` button)
+
+### Example images
+
+## Known bugs...
+
+- When extracting, modifying and injecting the RPU file no live progress is shown because of a problem catching output from *dovi_tool*
