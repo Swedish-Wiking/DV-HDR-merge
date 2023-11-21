@@ -51,19 +51,25 @@ If frame dimensions do not match the script will automagically correct for it.
 5. Closes window and sends inputed frame-shift to be used when combining the two media.<br>
 (Closing the window will do the same as the `Done` button)
 
+Always compare multiple refrence frames in case of missing or extra frames in some of the materials used.
+
 ### Example images
+
+Both senarios are using frame 30000 as the HDR refrence frame.
 
 #### Unsynced images
 <p float="left">
-  <img src="/EXAMPLES/UNSYNCED.PNG" width="50%" height="auto">
-  <img src="/EXAMPLES/UNSYNCED_DIF.PNG" width="50%" height="auto">
+  <img src="/EXAMPLES/UNSYNCED.PNG" width="49%" height="auto">
+  <img src="/EXAMPLES/UNSYNCED_DIF.PNG" width="49%" height="auto">
 </p>
+*No frame shift have been added and the result is blurry edges and sometimes even different scenes. The difference images shows a lot of anomalies when pixels don't cancel each other out.*
 
 #### Synced images
 <p float="left">
-  <img src="/EXAMPLES/SYNCED.PNG" width="50%" height="auto">
-  <img src="/EXAMPLES/SYNCED_DIF.PNG" width="50%" height="auto">
+  <img src="/EXAMPLES/SYNCED.PNG" width="49%" height="auto">
+  <img src="/EXAMPLES/SYNCED_DIF.PNG" width="49%" height="auto">
 </p>
+*When Dolby Vison layer is shifted with -3 no blurry edges can be seen on the blend iamge and on the difference image no anomalies can be found. (Sometimes you can get a fades silhouette as in this case because the luminance levels could not be correctly matched when trying to tonemap the thumbnails taken from the media)*
 
 ## Known bugs...
 
