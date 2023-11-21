@@ -62,14 +62,14 @@ Both senarios are using frame 30000 as the HDR refrence frame.
   <img src="/EXAMPLES/UNSYNCED.PNG" width="49%" height="auto">
   <img src="/EXAMPLES/UNSYNCED_DIF.PNG" width="49%" height="auto">
 </p>
-*No frame shift have been added and the result is blurry edges and sometimes even different scenes. The difference images shows a lot of anomalies when pixels don't cancel each other out.*
+<i>No frame shift have been added and the result is blurry edges and sometimes even different scenes. The difference images shows a lot of anomalies when pixels don't cancel each other out.</i>
 
 #### Synced images
 <p float="left">
   <img src="/EXAMPLES/SYNCED.PNG" width="49%" height="auto">
   <img src="/EXAMPLES/SYNCED_DIF.PNG" width="49%" height="auto">
 </p>
-*When Dolby Vison layer is shifted with -3 no blurry edges can be seen on the blend iamge and on the difference image no anomalies can be found. (Sometimes you can get a fades silhouette as in this case because the luminance levels could not be correctly matched when trying to tonemap the thumbnails taken from the media)*
+<i>When Dolby Vison layer is shifted with -3 frames no blurry edges can be seen on the blend iamge and on the difference image no anomalies can be found. (Sometimes you can get a faded silhouette as in this case because the luminance levels could not be correctly matched when trying to tonemap the thumbnails taken from the media)</i>
 
 ## Known bugs...
 
