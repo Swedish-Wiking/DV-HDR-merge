@@ -52,6 +52,8 @@ If frame dimensions do not match the script will automagically correct for it.
 (Closing the window will do the same as the `Done` button)
 
 ### Example images
+<img src="/EXAMPLES/SYNCED.PNG" width="50%" height="auto">
+<img src="/EXAMPLES/SYNCED_DIF.PNG" width="50%" height="auto">
 
 ## Known bugs...
 
