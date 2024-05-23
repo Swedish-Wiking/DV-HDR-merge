@@ -5,7 +5,6 @@ import json
 import argparse
 import inquirer
 import shutil
-import time
 
 import tkinter.filedialog
 import tkinter.font
@@ -37,9 +36,10 @@ def createTempDir():
     logging.debug(f"Temp folder created at: {_temp}")
 
 class image_compare():
-    def __init__(self, hdr, dv):
+    def __init__(self, hdr, dv, hybrid):
         self.dv_file = dv
         self.hdr_file = hdr
+        self.hybrid = hybrid
         self.base_refrence = 1000
         self.shifted_frames = 0
         createTempDir()
@@ -132,25 +132,44 @@ class image_compare():
             hdr_out
         ]
 
-        dv_cmd = ["ffmpeg", 
-            "-hide_banner", 
-            "-v", "error",
-            "-y", 
-            "-ss", ss_dv,
-            "-i", self.dv_file["path"],
-            "-qscale:v", "1", 
-            "-vf", vf_DV,
-            "-vframes", "1",
-            dv_out
-        ]
-
         logging.debug("Generating HDR image...")
         try: subprocess.run(hdr_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception as e: logging.error(f"Failed to generate HDR screencapture | ERROR:{e}")
-        logging.debug("Generating DV image...")
-        try: subprocess.run(dv_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except Exception as e: logging.error(f"Failed to generate DV screencapture | ERROR:{e}")
 
+        if self.hybrid:
+            dv_cmd = ["ffmpeg", 
+                "-hide_banner", 
+                "-v", "error",
+                "-y", 
+                "-ss", ss_dv,
+                "-i", self.dv_file["path"],
+                "-qscale:v", "1", 
+                "-vf", vf_HDR,
+                "-vframes", "1",
+                dv_out
+            ]
+
+            logging.debug("Generating DV image...")
+            try: subprocess.run(dv_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            except Exception as e: logging.error(f"Failed to generate DV screencapture | ERROR:{e}")
+        
+        else:
+            dv_cmd = ["ffmpeg", 
+                "-hide_banner", 
+                "-v", "error",
+                "-y", 
+                "-ss", ss_dv,
+                "-i", self.dv_file["path"],
+                "-qscale:v", "1", 
+                "-vf", vf_DV,
+                "-vframes", "1",
+                dv_out
+            ]
+
+            logging.debug("Generating DV image...")
+            try: subprocess.run(dv_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            except Exception as e: logging.error(f"Failed to generate DV screencapture | ERROR:{e}")
+            
         logging.debug("Processing Images...")
         HDR_img = Image.open(hdr_out)
         DV_img = Image.open(dv_out)
@@ -341,7 +360,7 @@ def analyze_files(files):
 
     return metadata_list, cColorP
 
-def frame_seeker(hdr, dv):
+def frame_seeker(hdr, dv, hybrid):
     logging.warning("Dolby Vision layer probably needs to be delayed")
     isManual = inquirer.prompt([inquirer.Confirm("continue", message="Do you want to input pre-calculated frame-shift", default=False)])["continue"]
     if isManual:
@@ -350,7 +369,7 @@ def frame_seeker(hdr, dv):
             if(is_integer(delayed_frames) == False): logging.warning("Please input a valid number")
             else: delayed_frames = int(delayed_frames); break
     else:
-        comparer = image_compare(hdr, dv)
+        comparer = image_compare(hdr, dv, hybrid)
         delayed_frames = comparer.shifted_frames
     logging.info(f"Dolby Vision layer is shifted by {delayed_frames} frames")
     return delayed_frames
@@ -359,7 +378,7 @@ def match_files(data_list):
     matching_files = list()
     HDRs = [(media) for media in data_list if media["colorProfile"] == "HDR"]
     logging.debug(HDRs)
-    DVs = [(media) for media in data_list if media["colorProfile"] == "DV"] + [(media) for media in data_list if media["colorProfile"] == "HDR+DV"]
+    DVs = [(media) for media in data_list if media["colorProfile"] == "DV" or media["colorProfile"] == "HDR+DV"]
     logging.debug(DVs)
     if args.maxdif != None: maxDif = int(args.maxdif)
     else:
@@ -373,11 +392,12 @@ def match_files(data_list):
         miss = 0
         logging.info(f"Trying to match: {hdr_file["name"]}")
         for dv_file in DVs:
+            hybrid = True if dv_file["colorProfile"] == "HDR+DV" else False
             absDif = abs(hdr_file["frameCount"] - dv_file["frameCount"])
             if absDif == 0:
                 logging.info(f"Perfect match found with: {dv_file["name"]}")
                 isAutomatic = inquirer.prompt([inquirer.Confirm("auto", message="Want to frame match anyways?", default=False)])["auto"]
-                if isAutomatic: frames_to_delay = frame_seeker(hdr_file, dv_file)
+                if isAutomatic: frames_to_delay = frame_seeker(hdr_file, dv_file, hybrid)
                 else: frames_to_delay = 0
                 match = {"HDR_FILE": hdr_file, "DV_FILE": dv_file, "framesToDelay": frames_to_delay}
                 matching_files.append(match)
@@ -386,7 +406,7 @@ def match_files(data_list):
                 logging.info(f"Match found but with a difference of: {absDif} frames, file matched with: {dv_file["name"]}")
                 isMatch = inquirer.prompt([inquirer.Confirm("continue", message="Is it a match?", default=False)])["continue"]
                 if isMatch:
-                    frames_to_delay = frame_seeker(hdr_file, dv_file)
+                    frames_to_delay = frame_seeker(hdr_file, dv_file, hybrid)
                     match = {"HDR_FILE": hdr_file, "DV_FILE": dv_file, "framesToDelay": frames_to_delay}
                     matching_files.append(match)
                 else: logging.info("Trying another ")
@@ -552,10 +572,13 @@ def main():
     matched_files = match_files(file_data_list)
     for match in matched_files: 
         try: injectDoVi(match)
-        except RuntimeError: logging.error("Multiplexing of file FAILED")
-        except InterruptedError: logging.error("Multiplexing of file FAILED because of Human interuption")
-        else: 
+        except RuntimeError: 
+            logging.error("Multiplexing of file FAILED")
             try: shutil.rmtree(_temp)
             except: logging.warning("Could not delete temp folder")
-
+        except InterruptedError: 
+            logging.error("Multiplexing of file FAILED because of Human interuption")
+            try: shutil.rmtree(_temp)
+            except: logging.warning("Could not delete temp folder")
+            
 if __name__ == "__main__": main()
