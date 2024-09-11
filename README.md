@@ -1,4 +1,4 @@
-# DV_HDR_Merge
+# DV-HDR-merge
 A script to batch combine HDR media with Dolby Vison media for a hybrid file that uses Dolby Vision but with fallback to HDR.
 The script has a bulit in frame compare tool that makes syncing the different files very easy. 
 The script matches the files by comparing frame count because Dolby Vision RPU-files are based on frames, not on time.
