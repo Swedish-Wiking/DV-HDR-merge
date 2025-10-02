@@ -32,7 +32,7 @@ DV_HDR_Merge.py -logL debug -maxdif 100 HDR_movie.mkv DV_movie.mp4 HDR_movie2.mk
 HDR media: `*.mkv`\
 Dolby Vision media: `*.mkv`, `*.mp4`\
 
-*Can be customized to use `*.mp4` as HDR input as well but Matroska is the superior container.*\
+*Can be customized to use `*.mp4` as HDR input as well but Matroska is the superior container.*
 
 **Output format**: `*.mkv`
 
