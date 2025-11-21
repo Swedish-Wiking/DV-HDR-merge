@@ -8,7 +8,7 @@ The script matches the files by comparing frame count because Dolby Vision RPU-f
 
 The following dependencies must either be installed to PATH or added to a folder called `bin` in the main directory:
 
-**[FFmpeg](https://github.com/FFmpeg/FFmpeg)**
+**[FFmpeg](https://github.com/FFmpeg/FFmpeg)**\
 **[quietvoid/dovi_tool](https://github.com/quietvoid/dovi_tool)**\
 **[mkvmerge](https://mkvtoolnix.download/doc/mkvmerge.html)**\
 **[mkvextract](https://mkvtoolnix.download/doc/mkvextract.html)**
